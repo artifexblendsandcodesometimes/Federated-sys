@@ -83,6 +83,7 @@ def load_model(model_name: str = None, quantization_type: str = "nf4"):
     if device_type == "cuda":
         # ── GPU path: 4-bit NF4 ───────────────────────────────────────────────
         quantization_config = None
+        use_4bit = True
         try:
             quantization_config = BitsAndBytesConfig(
                 load_in_4bit=True,
@@ -90,15 +91,26 @@ def load_model(model_name: str = None, quantization_type: str = "nf4"):
                 bnb_4bit_quant_type=quantization_type,
                 bnb_4bit_use_double_quant=True,
             )
+            print("4-bit NF4 quantization config ready (bitsandbytes).")
         except Exception as e:
-            print(f"bitsandbytes unavailable ({e}), falling back to FP16 unquantized.")
+            print(f"[WARNING] bitsandbytes unavailable ({e}). Falling back to FP16 unquantized on GPU.")
+            quantization_config = None
+            use_4bit = False
 
         model = AutoModelForCausalLM.from_pretrained(
             model_name,
             quantization_config=quantization_config,
             device_map="auto",
-            torch_dtype=torch.float16,
+            dtype=torch.float16,
         )
+
+        # Verify model is on GPU; if not (e.g. device_map failed silently), force it.
+        first_param_device = next(model.parameters()).device
+        if first_param_device.type != "cuda":
+            print(f"[WARNING] Model loaded on {first_param_device} — forcing to CUDA.")
+            model = model.cuda()
+        else:
+            print(f"Model loaded on {first_param_device} ✓ (GPU confirmed)")
 
     else:
         # ── CPU path: FP32, no quantization ──────────────────────────────────
@@ -107,9 +119,10 @@ def load_model(model_name: str = None, quantization_type: str = "nf4"):
         # the accelerate device-split logic (which requires a GPU).
         model = AutoModelForCausalLM.from_pretrained(
             model_name,
-            torch_dtype=torch.float32,
+            dtype=torch.float32,
             device_map=None,
         )
+        print("Model loaded on CPU (no GPU available).")
 
     # Freeze base model — only AFLoRA B and Lambda matrices will be trained.
     for param in model.parameters():
