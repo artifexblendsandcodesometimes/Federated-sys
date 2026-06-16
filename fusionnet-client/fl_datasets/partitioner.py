@@ -140,11 +140,11 @@ def print_partition_report(device_tier: str, subset: Subset, dataset) -> None:
     cfg  = TIER_PARTITION_CONFIG.get(device_tier, TIER_PARTITION_CONFIG[_DEFAULT_TIER])
     info = describe_partition(subset, dataset)
 
-    print("\n" + "─" * 60)
-    print(f"  DATA PARTITION REPORT  │  Tier: {device_tier}")
-    print("─" * 60)
+    print("\n" + "-" * 60)
+    print(f"  DATA PARTITION REPORT  |  Tier: {device_tier}")
+    print("-" * 60)
     print(f"  Profile     : {cfg['description']}")
-    print(f"  α (Dirichlet): {cfg['alpha']}  │  Max fraction: {cfg['data_fraction'] * 100:.0f}% of corpus")
+    print(f"  alpha (Dirichlet): {cfg['alpha']}  |  Max fraction: {cfg['data_fraction'] * 100:.0f}% of corpus")
     print(f"  Shard size  : {info['total_samples']} samples")
     print(f"  Dominant label: #{info['dominant_label']}")
     print(f"  Label spread: {len(info['label_counts'])} unique classes in shard")
@@ -153,6 +153,6 @@ def print_partition_report(device_tier: str, subset: Subset, dataset) -> None:
     top5 = sorted(info["label_fractions"].items(), key=lambda x: -x[1])[:5]
     print("\n  Top-5 label distribution:")
     for label, frac in top5:
-        bar = "█" * int(frac * 40)
+        bar = "#" * int(frac * 40)
         print(f"    Label {label:>3}: {bar} {frac * 100:.1f}%")
-    print("─" * 60 + "\n")
+    print("-" * 60 + "\n")

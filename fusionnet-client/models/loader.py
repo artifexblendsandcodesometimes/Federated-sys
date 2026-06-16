@@ -110,7 +110,7 @@ def load_model(model_name: str = None, quantization_type: str = "nf4"):
             print(f"[WARNING] Model loaded on {first_param_device} — forcing to CUDA.")
             model = model.cuda()
         else:
-            print(f"Model loaded on {first_param_device} ✓ (GPU confirmed)")
+            print(f"Model loaded on {first_param_device} (GPU confirmed)")
 
     else:
         # ── CPU path: FP32, no quantization ──────────────────────────────────
