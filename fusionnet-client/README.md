@@ -13,18 +13,46 @@ This is the local client component of FusionNet, a privacy-preserving federated 
 
 ## Quickstart
 
+### Linux / macOS
+
 ```bash
 cd fusionnet-client
 pip install -r requirements.txt
 ```
 
+### Windows (PowerShell)
+
+```powershell
+# Option A — One-shot setup (recommended, run from repo root)
+.\scripts\setup_env.ps1              # CPU (any PC)
+.\scripts\setup_env.ps1 -Backend cuda  # NVIDIA GPU
+.\scripts\setup_env.ps1 -Backend rocm  # AMD GPU (installs CPU build; GPU needs WSL2)
+
+# Option B — Manual setup inside fusionnet-client\
+cd fusionnet-client
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
+> **Note for AMD GPU on Windows:** PyTorch ROCm wheels are Linux-only.
+> For full AMD GPU acceleration, use WSL2 (Ubuntu 22.04) and run `setup_rocm.sh` inside it.
+> CPU mode works natively on Windows with no extra steps.
+
 ### Run a Local Node
 
 ```bash
+# Linux / macOS
 # Node 0 of a 4-client federation (auto-detects hardware tier)
 python main.py --client-id 0 --num-clients 4
 
 # Node 1 of the same federation (gets a different Dirichlet shard)
+python main.py --client-id 1 --num-clients 4
+```
+
+```powershell
+# Windows PowerShell (same arguments)
+python main.py --client-id 0 --num-clients 4
 python main.py --client-id 1 --num-clients 4
 ```
 

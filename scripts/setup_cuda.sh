@@ -1,4 +1,9 @@
 #!/bin/bash
+# setup_cuda.sh — FusionNet NVIDIA CUDA setup for Linux / WSL2
+# ──────────────────────────────────────────────────────────────
+# Requires: NVIDIA driver >= 560 for CUDA 12.8
+# Windows users: use scripts\setup_cuda.ps1 instead (native PowerShell)
+# ──────────────────────────────────────────────────────────────
 set -e
 
 echo "Setting up NVIDIA CUDA environment for FusionNet..."

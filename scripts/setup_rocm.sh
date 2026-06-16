@@ -1,4 +1,9 @@
 #!/bin/bash
+# setup_rocm.sh — FusionNet AMD ROCm setup for Linux / WSL2
+# ──────────────────────────────────────────────────────────
+# Requires: ROCm 6.1+ on Linux or WSL2 (Ubuntu 22.04 recommended)
+# Windows users: use scripts\setup_rocm.ps1 (CPU) or WSL2 + this script (GPU)
+# ──────────────────────────────────────────────────────────
 set -e
 
 echo "Setting up AMD ROCm environment for FusionNet..."

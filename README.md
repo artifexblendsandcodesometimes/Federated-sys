@@ -653,7 +653,72 @@ fusionnet/
 │       ├── example_train.py
 │       └── example_federated_round.py
 └── scripts/
+    ├── setup_env.ps1              # ⬅️ Windows: one-shot environment setup
+    ├── setup_cuda.ps1             # ⬅️ Windows: NVIDIA CUDA setup
+    ├── setup_rocm.ps1             # ⬅️ Windows: AMD ROCm (CPU + WSL2 guide)
+    ├── launch_fl_round.ps1        # ⬅️ Windows: multi-client FL launcher
+    ├── setup_cuda.sh              # Linux/WSL2: NVIDIA CUDA setup
+    ├── setup_rocm.sh              # Linux/WSL2: AMD ROCm setup
+    ├── launch_fl_round.sh         # Linux/WSL2: FL round launcher
+    └── test_local_training.py
 ```
+
+---
+
+## 🪟 Windows Quick-Start
+
+FusionNet runs natively on Windows. All scripts have `.ps1` (PowerShell) equivalents.
+
+### Step 1 — Environment Setup (run once from repo root)
+
+```powershell
+# CPU-only (any Windows PC — works out of the box)
+.\scripts\setup_env.ps1
+
+# NVIDIA GPU (requires driver >= 560, CUDA 12.8)
+.\scripts\setup_env.ps1 -Backend cuda
+
+# AMD GPU (installs CPU build; for full GPU acceleration use WSL2 + setup_rocm.sh)
+.\scripts\setup_env.ps1 -Backend rocm
+```
+
+### Step 2 — Run a Client Node
+
+```powershell
+cd fusionnet-client
+python main.py --client-id 0 --num-clients 4
+```
+
+### Step 3 — Launch a Full Federated Round
+
+```powershell
+# From repo root — spawns 3 clients in parallel as background jobs
+.\scripts\launch_fl_round.ps1 -NumClients 3 -FederationRounds 1
+```
+
+### AMD GPU on Windows — WSL2 Path
+
+PyTorch ROCm wheels are Linux-only. For full AMD GPU acceleration on Windows:
+
+```powershell
+# Install WSL2 with Ubuntu 22.04
+wsl --install -d Ubuntu-22.04
+
+# Then inside WSL2
+bash scripts/setup_rocm.sh
+cd fusionnet-client && python main.py --client-id 0 --num-clients 4
+```
+
+### Script Reference
+
+| Task | Windows (PowerShell) | Linux / WSL2 (Bash) |
+|---|---|---|
+| Environment setup | `.\scripts\setup_env.ps1` | `pip install -r requirements.txt` |
+| NVIDIA CUDA setup | `.\scripts\setup_cuda.ps1` | `bash scripts/setup_cuda.sh` |
+| AMD ROCm setup | `.\scripts\setup_rocm.ps1` | `bash scripts/setup_rocm.sh` |
+| Launch FL round | `.\scripts\launch_fl_round.ps1` | `bash scripts/launch_fl_round.sh` |
+| Run single node | `python main.py --client-id 0` | `python main.py --client-id 0` |
+
 
 ---
 
