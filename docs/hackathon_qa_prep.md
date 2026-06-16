@@ -11,7 +11,7 @@ Yes, aggressive pruning does increase the local loss for that specific edge devi
    Even though the weak device is missing 40% of the model, the 60% it *does* have is still calculating gradients based on its unique, local, isolated data. The gradients it generates are "noisy" but point in the generally correct mathematical direction.
    
 2. **Weighted Aggregation (The Safety Net):** 
-   When the central server averages all the LoRA weights together using FedAvg, it does not treat them equally. The system uses a **Contribution Weight** multiplier. An MI300X Cloud GPU gets a `5.0x` multiplier, while a sliced CPU-only PC gets a `0.1x` multiplier. 
+   When the central server averages all the globally shared AFLoRA `A` matrices together using FedAvg, it does not treat them equally. The system uses a **Contribution Weight** multiplier. An MI300X Cloud GPU gets a `5.0x` multiplier, while a sliced CPU-only PC gets a `0.1x` multiplier. 
 
 **Conclusion:** 
 Because the pruned model's weight is discounted so heavily, its higher loss doesn't "pollute" the high-quality learning done by the big GPUs. It acts as a tiny, helpful nudge to the global model.
