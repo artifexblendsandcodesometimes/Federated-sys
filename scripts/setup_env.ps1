@@ -18,7 +18,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 Write-Host "==================================================" -ForegroundColor Cyan
-Write-Host "  FusionNet — Environment Setup (Windows)         " -ForegroundColor Cyan
+Write-Host "  FusionNet - Environment Setup (Windows)         " -ForegroundColor Cyan
 Write-Host "  Backend: $($Backend.ToUpper())                  " -ForegroundColor Cyan
 Write-Host "==================================================" -ForegroundColor Cyan
 

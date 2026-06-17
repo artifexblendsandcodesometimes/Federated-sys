@@ -13,9 +13,9 @@ if __name__ == "__main__":
 
     print("--- FusionNet Example Local Training ---")
     config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config.yaml")
-    client = FusionNetClient(config_path)
+    client = FusionNetClient(config_path, client_id=args.client_id)
 
     print(f"\nStarting local training (node {args.client_id}/{args.num_clients})...")
-    client.train(client_id=args.client_id, num_clients=args.num_clients)
+    client.train(num_clients=args.num_clients)
 
     print("\nTraining completed. Adapters saved to checkpoints/")

@@ -17,7 +17,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 Write-Host "==================================================" -ForegroundColor Cyan
-Write-Host "  FusionNet — Federated Learning Round (Windows)  " -ForegroundColor Cyan
+Write-Host "  FusionNet - Federated Learning Round (Windows)  " -ForegroundColor Cyan
 Write-Host "==================================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "  Clients     : $NumClients" -ForegroundColor White

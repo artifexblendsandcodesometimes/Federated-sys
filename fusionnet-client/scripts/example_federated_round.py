@@ -27,6 +27,6 @@ if __name__ == "__main__":
     global_a_update = simulate_coordinator_aggregation([updates])
     
     print("\n[Client] Receiving global A matrices...")
-    client.fed_client.receive_global_A(global_a_update)
+    client.fed_client.receive_global_A(round_num=1)
     
     print("\nFederated round cycle complete!")

@@ -49,7 +49,7 @@ def get_dataset(config, tokenizer, device_tier: str = "CPU_only", client_id: int
             max_length=128,
         )
 
-    tokenized = raw_dataset.map(tokenize_function, batched=True)
+    tokenized = raw_dataset.map(tokenize_function, batched=True, load_from_cache_file=False)
 
     # Normalise label column name to 'labels'
     cols_to_remove = [

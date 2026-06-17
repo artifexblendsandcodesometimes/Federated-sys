@@ -101,7 +101,7 @@ def load_model(model_name: str = None, quantization_type: str = "nf4"):
             model_name,
             quantization_config=quantization_config,
             device_map="auto",
-            dtype=torch.float16,
+            torch_dtype=torch.float16,
         )
 
         # Verify model is on GPU; if not (e.g. device_map failed silently), force it.
@@ -119,7 +119,7 @@ def load_model(model_name: str = None, quantization_type: str = "nf4"):
         # the accelerate device-split logic (which requires a GPU).
         model = AutoModelForCausalLM.from_pretrained(
             model_name,
-            dtype=torch.float32,
+            torch_dtype=torch.float32,
             device_map=None,
         )
         print("Model loaded on CPU (no GPU available).")
