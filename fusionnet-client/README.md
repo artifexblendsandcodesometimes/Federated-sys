@@ -33,8 +33,10 @@ The `.env` file is gitignored and will not be committed.
 
 ```bash
 cd fusionnet-client
+python -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
-python ../auth.py  # authenticate with Hugging Face
+python auth.py  # authenticate with Hugging Face
 ```
 
 ### Windows (PowerShell)
@@ -58,19 +60,24 @@ pip install -r requirements.txt
 
 ### Run a Local Node
 
+Always ensure your virtual environment is active before running python scripts.
+
 ```bash
-# Linux / macOS
-# Node 0 of a 4-client federation, running 3 FL rounds
-python main.py --client-id 0 --num-clients 4 --rounds 3
+# Linux / macOS (Ensure venv is active)
+# Node 0 of a 2-client federation, running 1 FL round
+python main.py --client-id 0 --num-clients 2 --rounds 1
 
 # Node 1 of the same federation (gets a different Dirichlet shard)
-python main.py --client-id 1 --num-clients 4 --rounds 3
+python main.py --client-id 1 --num-clients 2 --rounds 1
 ```
 
 ```powershell
-# Windows PowerShell (same arguments)
-python main.py --client-id 0 --num-clients 4 --rounds 3
-python main.py --client-id 1 --num-clients 4 --rounds 3
+# Windows PowerShell (Ensure venv is active)
+# If venv was created in the repo root via setup_env.ps1:
+..\venv\Scripts\Activate.ps1
+
+# Node 0 of a 2-client federation, running 1 FL round
+python main.py --client-id 0 --num-clients 2 --rounds 1
 ```
 
 | Argument | Default | Description |
@@ -81,18 +88,26 @@ python main.py --client-id 1 --num-clients 4 --rounds 3
 
 ### Run the Coordinator
 
-In a separate terminal, start the coordinator to aggregate client updates:
+In a separate terminal, activate the virtual environment and start the coordinator:
 
 ```bash
-python scripts/hf_coordinator.py --num-clients 4 --rounds 3
+# From repo root:
+# Linux / macOS
+source venv/bin/activate
+python scripts/hf_coordinator.py --num-clients 2 --rounds 1
+
+# Windows (PowerShell)
+.\venv\Scripts\Activate.ps1
+python scripts/hf_coordinator.py --num-clients 2 --rounds 1
 ```
 
 The coordinator polls the private HF repo (`yash-goswami/fusionnet-coordinator`) until all clients have uploaded for each round, then runs FedAvg and pushes the global A matrices back.
 
 ### Run Examples
 
+Ensure virtual environment is active:
 ```bash
-python scripts/example_train.py --client-id 0 --num-clients 4
+python scripts/example_train.py --client-id 0 --num-clients 2
 python scripts/example_federated_round.py
 ```
 
@@ -147,7 +162,7 @@ fusionnet-client/
 │   └── privacy.py             # Abstract DP engine (Opacus + fallback)
 ├── training/
 │   └── engine.py              # Local training loop
-├── datasets/
+├── fl_datasets/
 │   ├── __init__.py
 │   ├── loader.py              # Dataset loading + Dirichlet partition call
 │   └── partitioner.py         # Dirichlet Non-IID partitioner (NEW)

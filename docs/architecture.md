@@ -44,7 +44,7 @@ In production, devices can be grouped into architecture-specific cohorts. Each c
 
 To honestly demonstrate federated learning's value, each simulated client must hold a **genuinely different** data distribution — just as a hospital clinic holds different sentiment patterns than a bank branch.
 
-FusionNet uses a **Dirichlet-skewed, device-tier-aware** partitioning strategy implemented in `fusionnet-client/datasets/partitioner.py`.
+FusionNet uses a **Dirichlet-skewed, device-tier-aware** partitioning strategy implemented in `fusionnet-client/fl_datasets/partitioner.py`.
 
 ### How It Works
 

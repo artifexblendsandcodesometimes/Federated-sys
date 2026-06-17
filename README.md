@@ -671,11 +671,30 @@ fusionnet/
 
 ---
 
+## 🛠️ Bug Fixes & System Stability Updates
+
+During development and live testing, several issues were identified and resolved to ensure robust, serverless federated learning execution on Windows and heterogeneous hardware:
+
+1. **PowerShell Script Parser Fixes (`scripts/setup_env.ps1`, `scripts/launch_fl_round.ps1`)**:
+   - Replaced non-standard em-dashes (`—`) in comments/strings with standard hyphens (`-`) to prevent PowerShell script execution parser failures on Windows.
+2. **Quantized Model Loading (`fusionnet-client/models/loader.py`)**:
+   - Fixed the `from_pretrained()` loading parameters by replacing the invalid `dtype` argument with the correct `torch_dtype` keyword argument.
+3. **AFLoRA Layer Device/Dtype Matching (`fusionnet-client/aflora/layer.py`)**:
+   - Fixed a runtime CPU/CUDA device and dtype mismatch by dynamically casting AFLoRA weights (`A`, `B`, and `Lambda`) to the input tensor's `device` and `dtype` inside `forward()`.
+4. **HuggingFace Cache Parallel Write Lock (`fusionnet-client/fl_datasets/loader.py`)**:
+   - Disabled Hugging Face datasets caching using `hf_datasets.disable_caching()` before running dataset mapping. This prevents a `FileExistsError` race condition when multiple local clients process datasets simultaneously on Windows.
+5. **Causal Language Model Target Labels Shape Mismatch (`fusionnet-client/training/engine.py`)**:
+   - Explicitly cloned input IDs to initialize target labels (`batch['labels'] = batch['input_ids'].clone()`), fixing shape mismatches during local fine-tuning on classification tasks like Banking77.
+
+---
+
 ## 🪟 Windows Quick-Start
 
 FusionNet runs natively on Windows. All scripts have `.ps1` (PowerShell) equivalents.
 
 ### Step 1 — Environment Setup (run once from repo root)
+
+Open PowerShell as Administrator (or standard user if python is globally configured) and run:
 
 ```powershell
 # CPU-only (any Windows PC — works out of the box)
@@ -690,32 +709,48 @@ FusionNet runs natively on Windows. All scripts have `.ps1` (PowerShell) equival
 
 ### Step 1.5 — Hugging Face Authentication
 
-Create a `.env` file in the repo root with your HF token (get one at [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)):
+Create a `.env` file in the repo root with your HF token (obtain one with write scope at [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)):
 
-```
+```env
 HF_TOKEN=your_token_here
 ```
 
-Then run:
+Then authenticate by running (from the repo root):
 
 ```powershell
+# Activate environment and run authentication helper
+.\venv\Scripts\Activate.ps1
 python fusionnet-client/auth.py
 ```
 
 The `.env` file is gitignored and will not be committed.
 
-### Step 2 — Run a Client Node
+### Step 2 — Run the Coordinator (polls HF Hub and aggregates updates)
+
+In a separate terminal, activate the virtual environment and start the coordinator:
 
 ```powershell
-cd fusionnet-client
-python main.py --client-id 0 --num-clients 4 --rounds 3
+# From repo root
+.\venv\Scripts\Activate.ps1
+python scripts/hf_coordinator.py --num-clients 2 --rounds 1
 ```
 
-### Step 2.5 — Run the Coordinator (separate terminal)
+### Step 3 — Launch the Clients
+
+In another terminal, run the multi-client launcher to start local client training:
 
 ```powershell
-# From repo root — polls HF Hub and aggregates client updates
-python scripts/hf_coordinator.py --num-clients 4 --rounds 3
+# From repo root
+powershell -ExecutionPolicy Bypass -Command "& { .\venv\Scripts\Activate.ps1; .\scripts\launch_fl_round.ps1 -NumClients 2 -FederationRounds 1 }"
+```
+
+To run a single client node manually:
+
+```powershell
+# Activate venv and run main.py inside fusionnet-client directory
+cd fusionnet-client
+..\venv\Scripts\Activate.ps1
+python main.py --client-id 0 --num-clients 2 --rounds 1
 ```
 
 ### AMD GPU on Windows — WSL2 Path
@@ -732,6 +767,8 @@ cd fusionnet-client && python main.py --client-id 0 --num-clients 4
 ```
 
 ### Script Reference
+
+Always activate the virtual environment (`.\venv\Scripts\Activate.ps1`) before executing Python scripts.
 
 | Task | Windows (PowerShell) | Linux / WSL2 (Bash) |
 |---|---|---|

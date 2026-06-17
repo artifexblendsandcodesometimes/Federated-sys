@@ -78,7 +78,7 @@ Current status: `comms/rccl_backend.py` is a placeholder. The planned use is `di
 
 ## Dirichlet Partitioning and AMD Compute Tiers
 
-The data partitioning system (`datasets/partitioner.py`) is hardware-aware by design. The AMD hardware tier detected at startup directly determines both the shard size and the Dirichlet concentration parameter for the Non-IID split. This means AMD hardware capability is not just a training parameter — it shapes the data the node is allowed to see, creating a coherent heterogeneity story across compute and data layers simultaneously.
+The data partitioning system (`fl_datasets/partitioner.py`) is hardware-aware by design. The AMD hardware tier detected at startup directly determines both the shard size and the Dirichlet concentration parameter for the Non-IID split. This means AMD hardware capability is not just a training parameter — it shapes the data the node is allowed to see, creating a coherent heterogeneity story across compute and data layers simultaneously.
 
 See `docs/architecture.md` for the full tier-to-partition mapping.
 

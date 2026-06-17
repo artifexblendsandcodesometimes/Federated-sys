@@ -53,7 +53,7 @@ The correct production path is **architecture cohorts**: GPU nodes form one fede
 ## Q5: How do you prove the data is actually heterogeneous across clients? Couldn't you have just given each client the same dataset?
 
 **Answer:**
-FusionNet uses **Dirichlet Non-IID partitioning** (`fusionnet-client/datasets/partitioner.py`) where both the shard size and label skewness are determined by the device hardware tier:
+FusionNet uses **Dirichlet Non-IID partitioning** (`fusionnet-client/fl_datasets/partitioner.py`) where both the shard size and label skewness are determined by the device hardware tier:
 
 | Tier | Dirichlet α | Shard Size | Analogy |
 |---|---|---|---|

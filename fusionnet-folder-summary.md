@@ -37,17 +37,20 @@
   - Builds the DataLoader and optimizer for AFLoRA B and Lambda parameters only.
   - Runs one local training epoch with correct gradient lifecycle: `zero_grad → forward → backward → step → zero_grad`.
   - Both Opacus and CustomPrivacyEngine paths call `zero_grad()` after `step()` to prevent gradient accumulation across batches.
+  - **Updated:** Clones input IDs to initialize target labels (`batch['labels'] = batch['input_ids'].clone()`) to prevent shape mismatch issues on target causal text generation tasks like Banking77.
 
 - `models/loader.py`
   - Detects hardware profile and loads the federation model (`TinyLlama/TinyLlama-1.1B-Chat-v1.0`).
   - Any `model.name` value in config is overridden to the federation constant with a warning — prevents aggregation crashes from shape mismatches.
   - Uses 4-bit NF4 quantization on GPU (bitsandbytes); falls back to FP32 on CPU (`device_map=None`).
+  - **Updated:** Uses `torch_dtype` instead of the invalid `dtype` parameter when calling `from_pretrained()` to prevent runtime errors.
   - Freezes all base model weights so only AFLoRA B and Lambda matrices train.
 
 - `aflora/layer.py`
   - Defines the `AFLoRALayer`.
   - Implements the adapter math `ΔW = A × Λ × B`.
   - Keeps `A` as shared global state and `B`/`Λ` as local trainable state.
+  - **Updated:** Casts AFLoRA weights (`A`, `B`, and `Lambda`) to the input tensor's `device` and `dtype` dynamically during `forward()`, avoiding CPU/CUDA device and precision mismatches.
 
 - `aflora/injection.py`
   - Finds target modules in the model and replaces them with AFLoRA layers.
@@ -65,16 +68,17 @@
   - Tries to use Opacus DP-SGD; if that fails, uses a custom DP fallback.
   - Also converts tensors to/from base64 for safe JSON transfer.
 
-- `datasets/__init__.py`
-  - Marks `datasets/` as a Python package so relative imports work correctly.
+- `fl_datasets/__init__.py`
+  - Marks `fl_datasets/` as a Python package so relative imports work correctly.
 
-- `datasets/loader.py`
+- `fl_datasets/loader.py`
   - Loads datasets like Banking77, SST-2, IMDB, or AG News.
   - Tokenizes text and prepares PyTorch tensors.
-  - **Updated:** calls `dirichlet_partition()` after tokenising, passing `device_tier`, `client_id`, and `num_clients`.
+  - Calls `dirichlet_partition()` after tokenising, passing `device_tier`, `client_id`, and `num_clients`.
+  - **Updated:** Disables Hugging Face dataset caching with `hf_datasets.disable_caching()` before running the map tokenization function. This resolves parallel write lock collisions when running multiple local clients on Windows.
   - Prints a per-node partition report (label distribution bar chart) at startup for demo visibility.
 
-- `datasets/partitioner.py`
+- `fl_datasets/partitioner.py`
   - **New file.** Implements device-tier-aware Dirichlet Non-IID data partitioning.
   - `dirichlet_partition(dataset, device_tier, client_id, num_clients)` — carves a shard whose size and label skewness both scale with the hardware tier.
   - `TIER_PARTITION_CONFIG` maps each device tier to a Dirichlet α and a data fraction cap:
